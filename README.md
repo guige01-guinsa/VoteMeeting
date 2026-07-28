@@ -1,3 +1,9 @@
 # VoteMeeting
 
-Apartment PDF Vote Counter
+간단한 의견 수렴 집계 HTML 프로그램입니다.
+
+## 사용 방법
+1. `index.html` 파일을 브라우저에서 엽니다.
+2. 분류(분류1~3)와 의견(찬성/반대)을 선택해 **의견 추가**를 누릅니다.
+3. 집계가 표에 반영됩니다.
+4. **CSV 다운로드**를 눌러 `opinion_summary.csv` 파일로 저장합니다.
