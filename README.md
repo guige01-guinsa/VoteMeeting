@@ -1,5 +1,10 @@
 # VoteMeeting
 
+## 실행 파일 다운로드
+
+`/home/runner/work/VoteMeeting/VoteMeeting/vote.html` 파일을 브라우저에서 열고 **실행 파일 다운로드** 버튼을 누르면,
+브라우저에서 바로 실행 가능한 `vote-meeting-run.html` 파일을 받을 수 있습니다.
+
 저는 CSV보다 내부 데이터 구조(DB)를 먼저 아래처럼 설계하겠습니다.
 
 항목	설명
