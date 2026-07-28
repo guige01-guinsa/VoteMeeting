@@ -37,12 +37,12 @@ def index():
     if request.method == "POST":
         if "pdf_file" not in request.files:
             flash("파일이 선택되지 않았습니다.", "error")
-            return redirect(request.url)
+            return redirect(url_for("index"))
 
         file = request.files["pdf_file"]
         if file.filename == "":
             flash("파일을 선택해 주세요.", "error")
-            return redirect(request.url)
+            return redirect(url_for("index"))
 
         if file and allowed_file(file.filename):
             from werkzeug.utils import secure_filename
@@ -54,10 +54,11 @@ def index():
             flash("PDF 파일이 성공적으로 업로드되었습니다.", "success")
         else:
             flash("PDF 파일만 업로드할 수 있습니다.", "error")
-            return redirect(request.url)
+            return redirect(url_for("index"))
 
     return render_template("index.html", extracted_text=extracted_text, filename=filename)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug)
