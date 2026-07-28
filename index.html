@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoteMeeting</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; max-width: 900px; }
+    h1 { margin-bottom: 8px; }
+    p { color: #555; }
+    textarea { width: 100%; min-height: 220px; margin-top: 8px; padding: 10px; box-sizing: border-box; }
+    button { margin-top: 12px; padding: 10px 14px; cursor: pointer; }
+    .result { margin-top: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+    .row { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <h1>VoteMeeting</h1>
+  <p>아래에 한 줄씩 투표 내용을 입력하세요. 예: <code>101동-1203 찬성</code></p>
+  <textarea id="votes" placeholder="101동-1203 찬성&#10;101동-808 반대&#10;102동-502 기권"></textarea>
+  <br />
+  <button id="countBtn">집계하기</button>
+
+  <div class="result" id="result">
+    <div class="row">총 투표수: 0</div>
+    <div class="row">찬성: 0</div>
+    <div class="row">반대: 0</div>
+    <div class="row">기권: 0</div>
+    <div class="row">무효: 0</div>
+  </div>
+
+  <script>
+    const countBtn = document.getElementById("countBtn");
+    const votesInput = document.getElementById("votes");
+    const result = document.getElementById("result");
+
+    const normalize = (text) => text.trim().toLowerCase();
+
+    function parseVote(line) {
+      const n = normalize(line);
+      if (!n) return null;
+      if (n.includes("찬성")) return "찬성";
+      if (n.includes("반대")) return "반대";
+      if (n.includes("기권")) return "기권";
+      return "무효";
+    }
+
+    function render(counts) {
+      result.innerHTML = `
+        <div class="row">총 투표수: ${counts.total}</div>
+        <div class="row">찬성: ${counts.agree}</div>
+        <div class="row">반대: ${counts.disagree}</div>
+        <div class="row">기권: ${counts.abstain}</div>
+        <div class="row">무효: ${counts.invalid}</div>
+      `;
+    }
+
+    countBtn.addEventListener("click", () => {
+      const lines = votesInput.value.split(/\r?\n/);
+      const counts = { total: 0, agree: 0, disagree: 0, abstain: 0, invalid: 0 };
+
+      for (const line of lines) {
+        const vote = parseVote(line);
+        if (!vote) continue;
+        counts.total += 1;
+        if (vote === "찬성") counts.agree += 1;
+        else if (vote === "반대") counts.disagree += 1;
+        else if (vote === "기권") counts.abstain += 1;
+        else counts.invalid += 1;
+      }
+
+      render(counts);
+    });
+  </script>
+</body>
+</html>
