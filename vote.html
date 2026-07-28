@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apartment Vote Meeting</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Apartment Vote Meeting</p>
+        <h1>아파트 의견수렴 자동 개표 시스템</h1>
+        <p class="lead">PDF 분석과 OCR이 추가될 준비가 된 초기 버전입니다. 지금은 내부 데이터 구조, 샘플 레코드, CSV 출력부터 안정적으로 시작합니다.</p>
+      </div>
+      <div class="hero-card">
+        <div class="status-label">진행 상태</div>
+        <div id="statusText" class="status-value">초기화 중...</div>
+        <div id="statusDetail" class="status-detail">데이터 모델을 불러오는 중입니다.</div>
+      </div>
+    </section>
+
+    <section class="toolbar card">
+      <div class="toolbar-group">
+        <label class="field">
+          <span>PDF 파일 선택</span>
+          <input id="pdfInput" type="file" accept="application/pdf" multiple />
+        </label>
+        <button id="loadSampleBtn" class="btn secondary" type="button">샘플 불러오기</button>
+        <button id="clearBtn" class="btn ghost" type="button">초기화</button>
+      </div>
+
+      <div class="toolbar-group right">
+        <label class="field compact">
+          <span>안건 수</span>
+          <input id="agendaCountInput" type="number" min="3" max="12" step="1" value="3" />
+        </label>
+        <button id="exportCsvBtn" class="btn primary" type="button">CSV 저장</button>
+      </div>
+    </section>
+
+    <section class="card import-card">
+      <div class="table-header">
+        <h2>PDF/OCR 가져오기</h2>
+        <p>선택한 PDF에서 페이지별 텍스트를 추출하고, 필요 시 OCR로 보완합니다.</p>
+      </div>
+      <div class="import-status">
+        <div>
+          <span>현재 단계</span>
+          <strong id="pipelineStep">대기</strong>
+        </div>
+        <div>
+          <span>처리 페이지</span>
+          <strong id="pageCount">0</strong>
+        </div>
+        <div>
+          <span>OCR 사용</span>
+          <strong id="ocrMode">비활성</strong>
+        </div>
+      </div>
+      <p id="pipelineLog" class="file-list">PDF를 선택하면 페이지 추출과 OCR 연결 상태가 여기에 표시됩니다.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card summary">
+        <h2>요약</h2>
+        <div class="metrics">
+          <div>
+            <span>선택된 PDF</span>
+            <strong id="pdfCount">0</strong>
+          </div>
+          <div>
+            <span>레코드</span>
+            <strong id="recordCount">0</strong>
+          </div>
+          <div>
+            <span>중복</span>
+            <strong id="duplicateCount">0</strong>
+          </div>
+        </div>
+        <p id="fileList" class="file-list">선택된 파일이 없습니다.</p>
+      </article>
+
+      <article class="card form-card">
+        <h2>수동 입력</h2>
+        <form id="recordForm" class="record-form">
+          <div class="row">
+            <label><span>동</span><input name="dong" required placeholder="101" /></label>
+            <label><span>호</span><input name="ho" required placeholder="1203" /></label>
+          </div>
+          <div class="row">
+            <label><span>이름</span><input name="name" required placeholder="홍길동" /></label>
+            <label><span>연락처</span><input name="phone" required placeholder="01012345678" /></label>
+          </div>
+          <div class="row">
+            <label><span>투표방법</span>
+              <select name="voteMethod">
+                <option value="앱">앱</option>
+                <option value="수개표">수개표</option>
+              </select>
+            </label>
+            <label><span>투표일시</span><input name="voteDate" type="datetime-local" required /></label>
+          </div>
+          <div class="row">
+            <label><span>1안</span>
+              <select name="agenda1">
+                <option value="찬성">찬성</option>
+                <option value="반대">반대</option>
+                <option value="기권">기권</option>
+              </select>
+            </label>
+            <label><span>2안</span>
+              <select name="agenda2">
+                <option value="찬성">찬성</option>
+                <option value="반대">반대</option>
+                <option value="기권">기권</option>
+              </select>
+            </label>
+            <label><span>3안</span>
+              <select name="agenda3">
+                <option value="찬성">찬성</option>
+                <option value="반대">반대</option>
+                <option value="기권">기권</option>
+              </select>
+            </label>
+          </div>
+          <label><span>중복확인</span>
+            <select name="duplicate">
+              <option value="정상">정상</option>
+              <option value="중복">중복</option>
+              <option value="확인필요">확인필요</option>
+            </select>
+          </label>
+          <button class="btn primary" type="submit">레코드 추가</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="card table-card">
+      <div class="table-header">
+        <h2>개표 결과</h2>
+        <p>현재는 샘플/수동 입력 데이터 기준으로 동작합니다. 이후 PDF/OCR 결과가 여기에 연결됩니다.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
