@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoteMeeting – 아파트 PDF 투표 집계기</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #1a56db;
+    }
+
+    header p {
+      color: #555;
+      margin-top: 0.4rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .flash-list {
+      list-style: none;
+      margin-bottom: 1.25rem;
+    }
+
+    .flash-list li {
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .flash-list li.success { background: #d1fae5; color: #065f46; }
+    .flash-list li.error   { background: #fee2e2; color: #991b1b; }
+
+    .upload-area {
+      border: 2px dashed #93c5fd;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .upload-area:hover { background: #eff6ff; }
+
+    .upload-area input[type="file"] {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-label {
+      display: block;
+      font-size: 1rem;
+      color: #1a56db;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .upload-hint {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.3rem;
+    }
+
+    #file-name-display {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: #374151;
+    }
+
+    .btn-submit {
+      display: block;
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.75rem;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover { background: #1648c0; }
+
+    .result-section {
+      margin-top: 2rem;
+    }
+
+    .result-section h2 {
+      font-size: 1.1rem;
+      color: #1a56db;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-section pre {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 1rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.85rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗳️ VoteMeeting</h1>
+  <p>아파트 회의 투표 PDF 집계기 – PDF 파일을 업로드하여 내용을 확인하세요</p>
+</header>
+
+<div class="card">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flash-list">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" enctype="multipart/form-data" action="/">
+
+    <div class="upload-area" id="drop-zone">
+      <div class="upload-icon">📄</div>
+      <label class="upload-label" for="pdf_file">PDF 파일 선택 또는 여기에 끌어다 놓기</label>
+      <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" />
+      <p class="upload-hint">PDF 파일만 허용됩니다 (최대 16 MB)</p>
+      <p id="file-name-display"></p>
+    </div>
+
+    <button type="submit" class="btn-submit">📤 업로드 및 내용 보기</button>
+
+  </form>
+
+  {% if extracted_text is not none %}
+  <div class="result-section">
+    <h2>📋 추출된 내용 – {{ filename }}</h2>
+    <pre>{{ extracted_text }}</pre>
+  </div>
+  {% endif %}
+
+</div>
+
+<footer>VoteMeeting &copy; 2024</footer>
+
+<script>
+  const input = document.getElementById('pdf_file');
+  const display = document.getElementById('file-name-display');
+  const dropZone = document.getElementById('drop-zone');
+
+  input.addEventListener('change', () => {
+    display.textContent = input.files.length ? '선택된 파일: ' + input.files[0].name : '';
+  });
+
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.background = '#eff6ff'; });
+  dropZone.addEventListener('dragleave', () => { dropZone.style.background = ''; });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.background = '';
+    const files = e.dataTransfer.files;
+    if (files.length && files[0].name.endsWith('.pdf')) {
+      const dt = new DataTransfer();
+      dt.items.add(files[0]);
+      input.files = dt.files;
+      display.textContent = '선택된 파일: ' + files[0].name;
+    } else {
+      alert('PDF 파일만 업로드할 수 있습니다.');
+    }
+  });
+</script>
+</body>
+</html>
