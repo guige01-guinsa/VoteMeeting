@@ -1,0 +1,49 @@
+:root {
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  color: #172033;
+  background: #eef2f7;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: #eef2f7; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+
+.app-shell { width: min(1040px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 32px; }
+.hero { margin-bottom: 28px; }
+.eyebrow, .step { margin: 0 0 6px; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.hero h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); }
+.hero > p:last-child { max-width: 720px; margin: 12px 0 0; line-height: 1.7; }
+
+.panel { margin: 18px 0; padding: 24px; background: #fff; border: 1px solid #dce3ed; border-radius: 18px; box-shadow: 0 10px 30px rgba(23,32,51,.06); }
+.panel-heading, .export-panel { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+h2 { margin: 0; font-size: 21px; }
+.badge { padding: 7px 11px; border-radius: 999px; background: #eef2f7; font-size: 13px; font-weight: 700; }
+
+#pdfFiles { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.file-picker { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; margin-top: 20px; border: 2px dashed #aeb9c8; border-radius: 14px; cursor: pointer; text-align: center; }
+.file-picker strong { font-size: 19px; }
+.file-picker span { margin-top: 7px; font-size: 14px; }
+.file-summary { margin-top: 14px; font-size: 14px; line-height: 1.6; }
+
+.primary-button, .secondary-button { min-width: 126px; padding: 12px 18px; border: 0; border-radius: 10px; font-weight: 800; }
+.primary-button { background: #172033; color: #fff; }
+.secondary-button { background: #e7ecf3; color: #172033; }
+.progress-track { height: 12px; margin-top: 24px; overflow: hidden; background: #e7ecf3; border-radius: 999px; }
+.progress-bar { width: 0; height: 100%; background: #172033; transition: width .25s ease; }
+.status-text { margin: 10px 0 0; font-size: 14px; }
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 22px; }
+.stats-grid article { padding: 16px; background: #f7f9fc; border-radius: 12px; }
+.stats-grid span, .stats-grid strong { display: block; }
+.stats-grid span { font-size: 13px; }
+.stats-grid strong { margin-top: 8px; font-size: 24px; }
+.export-panel p { margin: 8px 0 0; }
+footer { padding-top: 10px; text-align: center; font-size: 12px; }
+
+@media (max-width: 760px) {
+  .app-shell { width: min(100% - 20px, 1040px); padding-top: 24px; }
+  .panel-heading, .export-panel { align-items: stretch; flex-direction: column; }
+  .primary-button, .secondary-button { width: 100%; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
